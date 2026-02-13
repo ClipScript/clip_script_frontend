@@ -10,6 +10,7 @@ import { Loader } from "@/components/genreral/loader";
 import { copyToClipboard, downLoadFile } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Clipboard, Download } from "lucide-react";
+import moment from "moment";
 
 export default function TranscriptPage() {
     const { id } = useParams();
@@ -51,7 +52,14 @@ export default function TranscriptPage() {
                     <p className="text-gray-600">Transcript not found.</p>
                 </div>
             ) : (
-                <div className="">
+                <div className="flex flex-col gap-2">
+                    <p className="text-xs text-red-400 ml-auto">
+                        {singleTranscript?.createdAt ? (
+                            moment(singleTranscript.createdAt).isSame(moment(), 'day')
+                                ? `Today, ${moment(singleTranscript.createdAt).format('h:mm A')}`
+                                : moment(singleTranscript.createdAt).format('MMM D, YYYY, h:mm A')
+                        ) : ''}
+                    </p>
                     <pre className="bg-muted text-primary font-mono p-4 rounded max-h-[70vh] overflow-auto whitespace-pre-wrap">
                         {singleTranscript?.transcript}
                     </pre>
