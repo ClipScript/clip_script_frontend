@@ -40,6 +40,7 @@ export default function RootLayout({
           pauseOnHover
         />
         {children}
+        {/* <Footer /> */}
       </body>
     </html>
   );

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { NavigationBar } from "../ui/NavigationIndex"
 import TranscribedChats from "./transcribedChats"
 import { Menu } from "lucide-react"
+import Footer from "./footer"
 
 interface LayoutProps {
     children: React.ReactNode
@@ -52,6 +53,9 @@ export function Layout({ children }: LayoutProps) {
                 >
                     {children}
                 </main>
+                <footer className="w-full max-w-full">
+                    <Footer />
+                </footer>
             </div>
         </div>
     )

@@ -26,6 +26,7 @@ export function useTranscription() {
                 status: result.status,
                 jobId: result.jobId
             });
+            fetchRecentTranscripts();
         } catch (err: any) {
             showToaster(err.message || 'Failed to generate transcript',);
         } finally {
