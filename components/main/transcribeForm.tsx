@@ -58,7 +58,7 @@ export default function TranscribeSection() {
                     className="border-2 border-primary focus:border-primary focus:ring-primary rounded-3xl px-4 py-8 w-full md:w-1/2 placeholder:text-primary/60 bg-transparent"
                     placeholder="Paste TikTok, Instagram Reel, or YouTube Shorts URL"
                 />
-                <Recaptcha onChange={onCaptchaChange} />
+                {!loading && <Recaptcha onChange={onCaptchaChange} />}
                 <button
                     type="submit"
                     className="w-full md:w-1/2 bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
