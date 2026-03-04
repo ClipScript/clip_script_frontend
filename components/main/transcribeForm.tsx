@@ -116,22 +116,22 @@ export default function TranscribeSection() {
                             {transcript ? (
                                 <>
                                     <div>
-                                        <pre className="p-4 rounded max-h-[70vh] text-primary bg-muted overflow-auto whitespace-pre-wrap">
+                                        <pre className={`p-4 ${!viewMode ? 'bg-primary text-white' : 'bg-transparent'} rounded max-h-[70vh] overflow-auto whitespace-pre-wrap`}>
                                             {!viewMode ? transcript?.transcript : (
                                                 <>
                                                     {Array.isArray(transcript.utterances) && transcript.utterances.length > 0 ? (
-                                                        <div className="space-y-2">
+                                                        <div className="space-y-1">
                                                             {transcript.utterances.map((utt, idx) => (
-                                                                <div key={idx} className="flex items-start gap-4 border-b border-gray-200 pb-1">
+                                                                <div key={idx} className="flex items-start gap-4 bg-primary border border-gray-200 text-white p-2 rounded-lg">
                                                                     <div className="flex flex-col gap-2 items-center">
-                                                                        <span className=" text-primary/60">
+                                                                        <span className=" text-red-100">
                                                                             {formatMs(utt.start)}
                                                                         </span>
                                                                         <button onClick={() => copyToClipboard(utt.text)} className="p-1 rounded hover:bg-primary/10 transition-colors duration-200">
-                                                                            <Copy className="w-4 h-4 text-primary/60" />
+                                                                            <Copy className="w-4 h-4 text-red-100" />
                                                                         </button>
                                                                     </div>
-                                                                    <span className="text-black">{utt.text}</span>
+                                                                    <span className="">{utt.text}</span>
                                                                 </div>
                                                             ))}
                                                         </div>
