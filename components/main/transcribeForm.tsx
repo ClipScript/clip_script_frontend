@@ -115,35 +115,33 @@ export default function TranscribeSection() {
                         <DialogDescription>
                             {transcript ? (
                                 <>
-                                    {!viewMode ? (
-                                        <div>
-                                            <pre className="font-mono p-4 rounded max-h-[70vh] text-black bg-muted overflow-auto whitespace-pre-wrap">
-                                                {transcript.transcript}
-                                            </pre>
-                                        </div>
-                                    ) : (
-                                        <div className="p-2 rounded max-h-[70vh] overflow-auto">
-                                            {Array.isArray(transcript.utterances) && transcript.utterances.length > 0 ? (
-                                                <div className="space-y-2">
-                                                    {transcript.utterances.map((utt, idx) => (
-                                                        <div key={idx} className="flex items-start gap-4 font-mono border-b border-gray-200 pb-1">
-                                                            <div className="flex flex-col gap-2 items-center">
-                                                                <span className=" text-primary/60">
-                                                                    {formatMs(utt.start)}
-                                                                </span>
-                                                                <button onClick={() => copyToClipboard(utt.text)} className="p-1 rounded hover:bg-primary/10 transition-colors duration-200">
-                                                                    <Copy className="w-4 h-4 text-primary/60" />
-                                                                </button>
-                                                            </div>
-                                                            <span className="text-black">{utt.text}</span>
+                                    <div>
+                                        <pre className="p-4 rounded max-h-[70vh] text-primary bg-muted overflow-auto whitespace-pre-wrap">
+                                            {!viewMode ? transcript?.transcript : (
+                                                <>
+                                                    {Array.isArray(transcript.utterances) && transcript.utterances.length > 0 ? (
+                                                        <div className="space-y-2">
+                                                            {transcript.utterances.map((utt, idx) => (
+                                                                <div key={idx} className="flex items-start gap-4 border-b border-gray-200 pb-1">
+                                                                    <div className="flex flex-col gap-2 items-center">
+                                                                        <span className=" text-primary/60">
+                                                                            {formatMs(utt.start)}
+                                                                        </span>
+                                                                        <button onClick={() => copyToClipboard(utt.text)} className="p-1 rounded hover:bg-primary/10 transition-colors duration-200">
+                                                                            <Copy className="w-4 h-4 text-primary/60" />
+                                                                        </button>
+                                                                    </div>
+                                                                    <span className="text-black">{utt.text}</span>
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <span className="text-gray-500">No utterances available.</span>
+                                                    ) : (
+                                                        <span className="text-gray-500">No utterances available.</span>
+                                                    )}
+                                                </>
                                             )}
-                                        </div>
-                                    )}
+                                        </pre>
+                                    </div>
                                     <div className="flex gap-4 mt-4 justify-end">
                                         <Button
                                             variant="default"
