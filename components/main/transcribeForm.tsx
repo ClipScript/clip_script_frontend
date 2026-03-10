@@ -20,6 +20,7 @@ import { Clipboard, Download, Copy } from "lucide-react";
 import { copyToClipboard, downLoadFile, downLoadVideo, downloadUtterances } from "@/lib/utils";
 import { SpinnerLoader } from "../genreral/common";
 import { formatMs } from "@/lib/utils";
+import LineLoader from "../genreral/lineLoader";
 
 
 
@@ -70,7 +71,7 @@ export default function TranscribeSection() {
                     className="w-full md:w-1/2 bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
                     disabled={loading || !captchaToken}
                 >
-                    {loading ? "Transcribing..." : "Generate Transcript"}
+                    {loading ? <div className="flex items-center justify-center gap-2"> <LineLoader /> Transcribing...</div> : "Generate Transcript"}
                 </button>
                 {error && <p className="text-red-500 text-sm">{toast.error(error)}</p>}
             </form>
@@ -81,7 +82,7 @@ export default function TranscribeSection() {
                 <DialogContent className="">
                     <DialogHeader>
                         <DialogTitle className="font-semibold">Review, Copy or Download</DialogTitle>
-                        <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center justify-between w-full mt-2">
                             <Switch
                                 id="viewModeToggle"
                                 checked={viewMode}

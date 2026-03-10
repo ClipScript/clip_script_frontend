@@ -43,7 +43,7 @@ export default function TranscriptProcess() {
                 </div>
                 <ol className="w-full md:w-1/2 space-y-6">
                     {TranscriptSteps.map((step, idx) => (
-                        <li key={step.title} className="flex items-start gap-4 bg-white rounded-xl shadow p-4 transition hover:shadow-lg">
+                        <li key={step.title} className="flex items-start gap-4 bg-background rounded-xl shadow p-4 transition hover:shadow-lg">
                             <div className="flex flex-col items-center mr-2">
                                 <span className="bg-blue-100 text-blue-700 rounded-full w-10 h-10 flex items-center justify-center mb-2">
                                     <step.icon className="w-6 h-6" />

@@ -12,7 +12,7 @@ export function Layout({ children }: LayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
     return (
-        <div className="min-h-screen flex bg-background">
+        <div className="min-h-screen flex">
             {/* Sidebar: TranscribedChats for mobile and desktop */}
             {/* Overlay for mobile */}
             {sidebarOpen && (

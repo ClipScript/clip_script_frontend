@@ -66,7 +66,7 @@ export default function Faqs() {
                 {faqs.map((faq, idx) => (
                     <li
                         key={faq.question}
-                        className="border border-primary/30 rounded-xl bg-white shadow-sm"
+                        className="border border-primary/30 rounded-xl bg-background shadow-sm hover:shadow-md transition-shadow duration-200"
                     >
                         <button
                             className="w-full flex items-center justify-between px-6 py-4 text-left focus:outline-none"
