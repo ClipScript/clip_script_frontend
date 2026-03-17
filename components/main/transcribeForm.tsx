@@ -21,6 +21,14 @@ import { copyToClipboard, downLoadFile, downLoadVideo, downloadUtterances } from
 import { SpinnerLoader } from "../genreral/common";
 import { formatMs } from "@/lib/utils";
 import LineLoader from "../genreral/lineLoader";
+import {
+    Popover,
+    PopoverContent,
+    PopoverDescription,
+    PopoverHeader,
+    PopoverTitle,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 
 
 
@@ -83,11 +91,14 @@ export default function TranscribeSection() {
                     <DialogHeader>
                         <DialogTitle className="font-semibold">Review, Copy or Download</DialogTitle>
                         <div className="flex items-center justify-between w-full mt-2">
-                            <Switch
-                                id="viewModeToggle"
-                                checked={viewMode}
-                                onCheckedChange={() => setViewMode(!viewMode)}
-                            />
+                            <div className="flex items-center gap-1">
+                                <Switch
+                                    id="viewModeToggle"
+                                    checked={viewMode}
+                                    onCheckedChange={() => setViewMode(!viewMode)}
+                                />
+                                <p>Timestamp</p>
+                            </div>
                             <div className="flex items-center gap-2">
                                 {viewMode ? (
                                     <Clipboard className="w-5 h-5 text-primary cursor-pointer" onClick={() => copyToClipboard(transcript?.transcript || '')} />
