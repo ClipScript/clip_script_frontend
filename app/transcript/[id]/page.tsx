@@ -13,8 +13,17 @@ import { useRouter } from "next/navigation";
 import { HiArrowLongLeft } from 'react-icons/hi2';
 import { downLoadVideo, downloadUtterances } from "@/lib/utils";
 import { SpinnerLoader } from "@/components/genreral/common";
-import { Clipboard, Download, Clock, FileText } from "lucide-react";
+import { Clipboard, Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { downloadFileActions } from "@/lib/utils";
+import {
+    Popover,
+    PopoverContent,
+    PopoverDescription,
+    PopoverHeader,
+    PopoverTitle,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 
 
 
@@ -86,32 +95,40 @@ export default function TranscriptPage() {
                                 }}
                             />
 
-                            <Download
-                                className="w-5 h-5 text-primary cursor-pointer"
-                                onClick={() => {
-                                    const downloadVideoFile = !viewMode ? singleTranscript?.transcript : downloadUtterances(singleTranscript?.utterances);
-                                    downLoadFile(downloadVideoFile!);
-                                }}
-                            />
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Download className="w-5 h-5 text-primary cursor-pointer" />
+                                </PopoverTrigger>
+                                <PopoverContent className="w-50 bg-primary text-white">
+                                    <div className="flex flex-col gap-1">
+                                        <p className="">Download as:</p>
+                                        <hr className="border-t border-gray-200 my-1" />
+                                        {downloadFileActions.map(({ label, icon: Icon, onClick }) => (
+                                            <button
+                                                key={label}
+                                                onClick={() => {
+                                                    const content = viewMode
+                                                        ? downloadUtterances(singleTranscript?.utterances)
+                                                        : (singleTranscript?.transcript?.replace(/([.?!])\s*/g, '$1\n') || "")
+
+                                                    if (!content) return;
+
+                                                    onClick(content);
+                                                }}
+                                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted cursor-pointer hover:text-primary transition group"
+                                            >
+                                                <Icon size={16} className="text-red-100 group-hover:text-red-400" />
+                                                <span className="text-sm">{label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                         </div>
                     </div>
                     <pre className="bg-muted text-primary font-mono p-4 rounded max-h-[70vh] overflow-auto whitespace-pre-wrap">
                         {!viewMode ? singleTranscript?.transcript : downloadUtterances(singleTranscript?.utterances)}
                     </pre>
-                    <div className="flex gap-4 mt-4 justify-end">
-                        <Button
-                            variant="default"
-                            className="flex items-center gap-2 bg-transparent text-primary border border-primary hover:bg-primary hover:text-white transition-colors duration-200"
-                            onClick={async () => {
-                                setIsDownloading(true);
-                                await downLoadVideo(singleTranscript?.jobId);
-                                setIsDownloading(false);
-                            }}
-                            disabled={isDownloading}
-                        >
-                            {isDownloading ? <SpinnerLoader /> : <>  <Download className="w-4 h-4" /> Download Video</>}
-                        </Button>
-                    </div>
                 </div>
             )}
         </Layout>

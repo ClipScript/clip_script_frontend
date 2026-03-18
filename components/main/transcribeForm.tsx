@@ -17,10 +17,17 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
 import { Clipboard, Download, Copy } from "lucide-react";
-import { copyToClipboard, downLoadFile, downLoadVideo, downloadUtterances } from "@/lib/utils";
+import { copyToClipboard, downLoadFile, downLoadVideo, downloadFile, downloadUtterances } from "@/lib/utils";
 import { SpinnerLoader } from "../genreral/common";
 import { formatMs } from "@/lib/utils";
 import LineLoader from "../genreral/lineLoader";
+import {
+    FileText,
+    FileSpreadsheet,
+    FileJson,
+    FileType,
+    FileDown
+} from 'lucide-react';
 import {
     Popover,
     PopoverContent,
@@ -29,6 +36,8 @@ import {
     PopoverTitle,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { downloadFileActions } from "@/lib/utils";
+
 
 
 
@@ -111,28 +120,46 @@ export default function TranscribeSection() {
                                         }}
                                     />
                                 )}
-                                {viewMode ? (
-                                    <Download
-                                        className="w-5 h-5 text-primary cursor-pointer"
-                                        onClick={() => {
-                                            const downloadVideoFile = downloadUtterances(transcript?.utterances);
-                                            downLoadFile(downloadVideoFile!);
-                                        }}
-                                    />
-                                ) : (
-                                    <Download className="w-5 h-5 text-primary cursor-pointer" onClick={() => downLoadFile(transcript?.transcript || "")} />
-                                )}
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Download className="w-5 h-5 text-primary cursor-pointer" />
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-50 bg-primary text-white">
+                                        <div className="flex flex-col gap-1">
+                                            <p className="">Download as:</p>
+                                            <hr className="border-t border-gray-200 my-1" />
+                                            {downloadFileActions.map(({ label, icon: Icon, onClick }) => (
+                                                <button
+                                                    key={label}
+                                                    onClick={() => {
+                                                        const content = viewMode
+                                                            ? downloadUtterances(transcript?.utterances)
+                                                            : (transcript?.transcript?.replace(/([.?!])\s*/g, '$1\n') || "")
+
+                                                        if (!content) return;
+
+                                                        onClick(content);
+                                                    }}
+                                                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted cursor-pointer hover:text-primary transition group"
+                                                >
+                                                    <Icon size={16} className="text-red-100 group-hover:text-red-400" />
+                                                    <span className="text-sm">{label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
                             </div>
                         </div>
                         <DialogDescription>
                             {transcript ? (
                                 <>
                                     <div>
-                                        <pre className={`p-4 ${!viewMode ? 'bg-primary text-white' : 'bg-transparent'} rounded max-h-[70vh] overflow-auto whitespace-pre-wrap`}>
+                                        <pre className={`${!viewMode ? 'bg-primary text-white p-4' : 'bg-transparent'} rounded max-h-[70vh] overflow-auto whitespace-pre-wrap`}>
                                             {!viewMode ? transcript?.transcript : (
                                                 <>
                                                     {Array.isArray(transcript.utterances) && transcript.utterances.length > 0 ? (
-                                                        <div className="space-y-1">
+                                                        <div className="space-y-1 w-full">
                                                             {transcript.utterances.map((utt, idx) => (
                                                                 <div key={idx} className="flex items-start gap-4 bg-primary border border-gray-200 text-white p-2 rounded-lg">
                                                                     <div className="flex flex-col gap-2 items-center">
@@ -153,19 +180,6 @@ export default function TranscribeSection() {
                                                 </>
                                             )}
                                         </pre>
-                                    </div>
-                                    <div className="flex gap-4 mt-4 justify-end">
-                                        <Button
-                                            variant="default"
-                                            className="flex items-center gap-2 bg-transparent text-primary border border-primary hover:bg-primary hover:text-white transition-colors duration-200"
-                                            onClick={async () => {
-                                                setIsDownloading(true);
-                                                await downLoadVideo(transcript?.jobId);
-                                                setIsDownloading(false);
-                                            }}
-                                        >
-                                            {isDownloading ? <SpinnerLoader /> : <><Download className="w-4 h-4" /> Download Video</>}
-                                        </Button>
                                     </div>
                                 </>
                             ) : "No transcript available."}

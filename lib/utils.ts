@@ -3,11 +3,15 @@ import { clsx, type ClassValue } from "clsx"
 import { toast } from "react-toastify";
 import { twMerge } from "tailwind-merge"
 import { UtteranceType } from "@/types/transcribe";
+import {
+  FileText,
+  FileSpreadsheet,
+  FileJson,
+  FileType,
+  FileDown
+} from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
-
-console.log(API_URL)
-
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -66,6 +70,57 @@ export const downLoadFile = (content: string) => {
   showToaster('File downloaded!', 'success');
 }
 
+type FileType = 'txt' | 'pdf' | 'docx' | 'csv';
+
+export const downloadFile = async (
+  content: string,
+  type: FileType
+) => {
+  switch (type) {
+    case 'txt': {
+      const blob = new Blob([content], { type: 'text/plain' });
+      triggerDownload(blob, 'Clip_Script.txt');
+      break;
+    }
+
+    case 'pdf': {
+      const { default: jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      doc.text(content, 10, 10);
+      doc.save('Clip_Script.pdf');
+      break;
+    }
+
+    case 'docx': {
+      const { Document, Packer, Paragraph } = await import('docx');
+      const { saveAs } = await import('file-saver');
+
+      const doc = new Document({
+        sections: [{ children: [new Paragraph(content)] }],
+      });
+
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, 'Clip_Script.docx');
+      break;
+    }
+
+    case 'csv': {
+      const blob = new Blob([content], { type: 'text/csv' });
+      triggerDownload(blob, 'Clip_Script.csv');
+      break;
+    }
+  }
+};
+
+const triggerDownload = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 export const downLoadVideo = async (jobId?: string) => {
   if (!jobId) return;
   try {
@@ -104,3 +159,28 @@ export function downloadUtterances(transcript: Array<UtteranceType> | undefined)
   const utteranceText = transcript?.map(utt => `${formatMs(utt.start)} - ${utt.text}`).join('\n');
   return utteranceText;
 }
+
+
+
+export const downloadFileActions = [
+  {
+    label: "PDF",
+    icon: FileText,
+    onClick: (transcript: string) => downloadFile(transcript, 'pdf')
+  },
+  {
+    label: "TXT",
+    icon: FileText,
+    onClick: (transcript: string) => downloadFile(transcript, 'txt')
+  },
+  {
+    label: "DOCX",
+    icon: FileType,
+    onClick: (transcript: string) => downloadFile(transcript, 'docx')
+  },
+  {
+    label: "CSV",
+    icon: FileSpreadsheet,
+    onClick: (transcript: string) => downloadFile(transcript, 'csv')
+  },
+];

@@ -33,6 +33,7 @@ export function useTranscription() {
             const { jobId } = await TranscribeService.createTranscription(videoUrl, captchaToken);
 
             const result = await pollJobStatus(jobId);
+            console.log(result)
             setTranscript({
                 transcript: result.transcript,
                 status: result.status,
@@ -74,7 +75,7 @@ export function useTranscription() {
                     clearInterval(interval);
                     reject(error);
                 }
-            }, 2000); // Poll every 2 seconds
+            }, 1000); // Poll every 2 seconds
 
             // Timeout after 5 minutes
             setTimeout(() => {
