@@ -10,6 +10,7 @@ export function useTranscription() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [progress, setProgress] = useState(0);
+    const [isDownloading, setIsDownloading] = useState(false);
 
 
     const fetchRecentTranscripts = useCallback(async () => {
@@ -86,6 +87,20 @@ export function useTranscription() {
     };
 
 
+    const downloadVideo = async (videoUrl: string, captchaToken: string | null) => {
+        if (!videoUrl || !captchaToken) return;
+        setIsDownloading(true);
+        try {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            showToaster("Calm down - Close and Open your eyes. this will be ready soon", "success");
+        } catch (error) {
+            console.error("Error downloading video:", error);
+        } finally {
+            setIsDownloading(false);
+        }
+    }
+
+
     return {
         loading,
         error,
@@ -95,5 +110,7 @@ export function useTranscription() {
         isFetching,
         recentTranscripts,
         fetchRecentTranscripts,
+        isDownloading,
+        downloadVideo,
     }
 }

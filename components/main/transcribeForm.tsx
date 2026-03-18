@@ -16,7 +16,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
-import { Clipboard, Download, Copy } from "lucide-react";
+import { Clipboard, Download, Copy, Mic } from "lucide-react";
 import { copyToClipboard, downLoadFile, downLoadVideo, downloadFile, downloadUtterances } from "@/lib/utils";
 import { SpinnerLoader } from "../genreral/common";
 import { formatMs } from "@/lib/utils";
@@ -37,30 +37,49 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { downloadFileActions } from "@/lib/utils";
-
-
+import { on } from "events";
 
 
 export default function TranscribeSection() {
     const [videoUrl, setVideoUrl] = useState("");
     const { captchaToken, onCaptchaChange } = useCaptcha();
-    const { submitTranscription, loading, error, transcript } = useTranscription();
+    const { submitTranscription, loading, downloadVideo, isDownloading, transcript } = useTranscription();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [isDownloading, setIsDownloading] = useState(false);
     const [viewMode, setViewMode] = useState<boolean>(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
 
     useEffect(() => {
         setIsDialogOpen(transcript !== null);
     }, [transcript]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
+        // e.preventDefault();
         if (!captchaToken) {
             toast.error("Please complete the CAPTCHA");
             return;
         }
         await submitTranscription(videoUrl, captchaToken);
     };
+
+
+    const Actions = [
+        {
+            label: "Generate Transcript",
+            icon: Mic,
+            onClick: () => {
+                handleSubmit();
+                setPopoverOpen(false);
+            }
+        },
+        {
+            label: "Download Video",
+            icon: Download,
+            onClick: () => {
+                downloadVideo(videoUrl, captchaToken);
+                setPopoverOpen(false);
+            }
+        },
+    ];
 
     return (
         <>
@@ -83,14 +102,48 @@ export default function TranscribeSection() {
                     placeholder="Paste TikTok, Instagram Reel, or YouTube Shorts URL"
                 />
                 {!loading && <Recaptcha onChange={onCaptchaChange} />}
-                <button
-                    type="submit"
-                    className="w-full md:w-1/2 bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
-                    disabled={loading || !captchaToken}
-                >
-                    {loading ? <div className="flex items-center justify-center gap-2"> <LineLoader /> Transcribing...</div> : "Generate Transcript"}
-                </button>
-                {error && <p className="text-red-500 text-sm">{toast.error(error)}</p>}
+                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                    <PopoverTrigger asChild>
+                        <button
+                            type="button"
+                            title={
+                                loading
+                                    ? "Transcription in progress..."
+                                    : isDownloading
+                                        ? "Downloading in progress..."
+                                        : !captchaToken
+                                            ? "Please complete the CAPTCHA"
+                                            : !videoUrl
+                                                ? "Please enter a video URL"
+                                                : "Generate Transcript & Download Video"
+                            }
+                            className="w-full md:w-1/2 bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
+                            disabled={loading || !captchaToken || isDownloading || !videoUrl}
+                        >
+                            {loading || isDownloading
+                                ?
+                                <div className="flex items-center justify-center gap-2"> <LineLoader /> {isDownloading ? "Downloading..." : "Transcribing..."}</div>
+                                :
+                                "Generate Transcript & Download Video"}
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-50 bg-primary text-white">
+                        <div className="flex flex-col gap-1">
+                            <p className="">Proceed to:</p>
+                            <hr className="border-t border-gray-200 my-1" />
+                            {Actions.map(({ label, icon: Icon, onClick }) => (
+                                <button
+                                    key={label}
+                                    onClick={onClick}
+                                    className="flex items-center gap-2 py-2 px-1 rounded-md hover:bg-muted cursor-pointer hover:text-primary transition group"
+                                >
+                                    <Icon size={18} className="text-red-200 group-hover:text-red-400" />
+                                    <span className="text-sm">{label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </PopoverContent>
+                </Popover>
             </form>
             <Dialog open={isDialogOpen} onOpenChange={(open) => {
                 setIsDialogOpen(open);
