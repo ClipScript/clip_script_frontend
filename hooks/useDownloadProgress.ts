@@ -17,9 +17,15 @@ export function useDownloadProgress(jobId: string | null) {
 
         // Handlers
         const handleProgress = (value: number) => setProgress(value);
-        const handleCompleted = () => {
+        const handleCompleted = (fileUrl: string) => {
             setProgress(100);
             setStatus("completed");
+
+            console.log("Download URL:", fileUrl);
+
+            const link = document.createElement('a');
+            link.href = fileUrl; // just the URL
+            link.click()
         };
         const handleError = () => setStatus("error");
 
