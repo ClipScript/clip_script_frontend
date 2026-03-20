@@ -37,7 +37,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { downloadFileActions } from "@/lib/utils";
-import { on } from "events";
+import { useDownloadProgress } from "@/hooks/useDownloadProgress";
 
 
 export default function TranscribeSection() {
@@ -47,6 +47,8 @@ export default function TranscribeSection() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [viewMode, setViewMode] = useState<boolean>(false);
     const [popoverOpen, setPopoverOpen] = useState(false);
+    const [downloadJobId, setDownloadJobId] = useState<string | null>(null);
+    const { progress, status } = useDownloadProgress(downloadJobId);
 
     useEffect(() => {
         setIsDialogOpen(transcript !== null);
@@ -74,11 +76,15 @@ export default function TranscribeSection() {
         {
             label: "Download Video",
             icon: Download,
-            onClick: () => {
-                downloadVideo(videoUrl, captchaToken);
+            onClick: async () => {
+                const jobId = await downloadVideo(videoUrl, captchaToken);
+                if (jobId) {
+                    setDownloadJobId(jobId);
+                }
+
                 setPopoverOpen(false);
             }
-        },
+        }
     ];
 
     return (
@@ -118,14 +124,16 @@ export default function TranscribeSection() {
                                                 : "Generate Transcript & Download Video"
                             }
                             className="w-full md:w-1/2 bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
-                            disabled={loading || !captchaToken || isDownloading || !videoUrl}
+                            disabled={loading || !captchaToken || isDownloading || !videoUrl || status === "downloading"}
                         >
-                            {loading || isDownloading
-                                ?
-                                <div className="flex items-center justify-center gap-2"> <LineLoader /> {isDownloading ? "Downloading..." : "Transcribing..."}</div>
-                                :
-                                "Generate Transcript & Download Video"}
+                            {loading
+                                ? <div className="flex items-center justify-center gap-2"> <LineLoader /> Transcribing...</div>
+                                : status === "downloading"
+                                    ? <div className="flex items-center justify-center gap-2"> <LineLoader /> {isDownloading || status === "downloading" ? `Downloading... ${Math.round(progress)}%` : "Transcribing..."}</div>
+                                    : "Generate Transcript Or Download Video"}
+
                         </button>
+
                     </PopoverTrigger>
                     <PopoverContent className="w-50 bg-primary text-white">
                         <div className="flex flex-col gap-1">

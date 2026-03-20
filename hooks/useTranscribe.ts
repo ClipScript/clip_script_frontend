@@ -2,6 +2,7 @@ import { useState, useCallback } from "react"
 import { TranscriptData, RecentTranscriptData } from "@/types/transcribe";
 import { TranscribeService } from "@/services/transcribe";
 import { showToaster } from "@/lib/utils";
+import { downloadService } from "@/services/download";
 
 export function useTranscription() {
     const [transcript, setTranscript] = useState<TranscriptData | null>(null);
@@ -89,10 +90,16 @@ export function useTranscription() {
 
     const downloadVideo = async (videoUrl: string, captchaToken: string | null) => {
         if (!videoUrl || !captchaToken) return;
+
         setIsDownloading(true);
+
         try {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            showToaster("Calm down - Close and Open your eyes. this will be ready soon", "success");
+            const { jobId } = await downloadService.downloadVideo(videoUrl, captchaToken);
+
+            showToaster('Download started!', "success");
+
+            return jobId;
+
         } catch (error) {
             console.error("Error downloading video:", error);
         } finally {
