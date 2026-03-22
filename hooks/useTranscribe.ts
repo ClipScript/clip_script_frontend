@@ -1,18 +1,19 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { TranscriptData, RecentTranscriptData } from "@/types/transcribe";
 import { TranscribeService } from "@/services/transcribe";
 import { showToaster } from "@/lib/utils";
 import { downloadService } from "@/services/download";
+import { useTranscribeProgress } from "./useTranscribeProgress";
 
 export function useTranscription() {
-    const [transcript, setTranscript] = useState<TranscriptData | null>(null);
     const [recentTranscripts, setRecentTranscripts] = useState<RecentTranscriptData[]>([]);
     const [isFetching, setIsFetching] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [progress, setProgress] = useState(0);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [transcribeJobId, setTranscribeJobId] = useState<string | null>(null);
 
+    const { progress, status, transcript } = useTranscribeProgress(transcribeJobId);
 
     const fetchRecentTranscripts = useCallback(async () => {
         setIsFetching(true);
@@ -26,67 +27,32 @@ export function useTranscription() {
         }
     }, []);
 
-    const submitTranscription = useCallback(async (videoUrl: string, captchaToken: string) => {
-        setLoading(true);
-        setError(null);
-        setProgress(0);
-
-        try {
-            const { jobId } = await TranscribeService.createTranscription(videoUrl, captchaToken);
-
-            const result = await pollJobStatus(jobId);
-            console.log(result)
-            setTranscript({
-                transcript: result.transcript,
-                status: result.status,
-                jobId: result.jobId,
-                utterances: result.utterances,
-                platform: result.platform,
-                videoUrl: result.videoUrl,
-            });
-
-            // Immediately refetch recent transcripts and wait for it to complete
-            await fetchRecentTranscripts();
-        } catch (err: any) {
-            console.log("Transcribing error", err)
-            showToaster('Failed to generate transcript', "error");
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        if (status === "completed") {
+            fetchRecentTranscripts();
         }
-    }, [fetchRecentTranscripts]);
+    }, [status, fetchRecentTranscripts]);
 
+    const submitTranscription = useCallback(
+        async (videoUrl: string, captchaToken: string) => {
+            setLoading(true);
+            setError(null);
 
+            try {
+                const { jobId } = await TranscribeService.createTranscription(videoUrl, captchaToken);
 
-    const pollJobStatus = async (jobId: string): Promise<TranscriptData> => {
-        return new Promise((resolve, reject) => {
-            const interval = setInterval(async () => {
-                try {
-                    const status = await TranscribeService.getJobStatus(jobId);
+                setTranscribeJobId(jobId);
 
-                    setProgress(status.progress || 0);
+                showToaster("Transcription started!", "success");
 
-                    if (status.status === 'completed') {
-                        clearInterval(interval);
-                        const result = await TranscribeService.getJobResult(jobId);
-                        resolve(result);
-                    } else if (status.status === 'failed') {
-                        clearInterval(interval);
-                        reject(new Error('Transcription failed'));
-                    }
-                } catch (error) {
-                    clearInterval(interval);
-                    reject(error);
-                }
-            }, 1000); // Poll every 2 seconds
-
-            // Timeout after 5 minutes
-            setTimeout(() => {
-                clearInterval(interval);
-                reject(new Error('Transcription timeout'));
-            }, 300000);
-        });
-    };
-
+            } catch (err) {
+                console.log("Transcribing error", err);
+                showToaster("Failed to generate transcript", "error");
+            } finally {
+                setLoading(false);
+            }
+        },
+        []);
 
     const downloadVideo = async (videoUrl: string, captchaToken: string | null) => {
         if (!videoUrl || !captchaToken) return;
@@ -108,6 +74,7 @@ export function useTranscription() {
     }
 
 
+
     return {
         loading,
         error,
@@ -119,5 +86,6 @@ export function useTranscription() {
         fetchRecentTranscripts,
         isDownloading,
         downloadVideo,
+        status
     }
 }

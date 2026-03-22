@@ -43,7 +43,7 @@ import { useDownloadProgress } from "@/hooks/useDownloadProgress";
 export default function TranscribeSection() {
     const [videoUrl, setVideoUrl] = useState("");
     const { captchaToken, onCaptchaChange } = useCaptcha();
-    const { submitTranscription, loading, downloadVideo, isDownloading, transcript } = useTranscription();
+    const { submitTranscription, loading, downloadVideo, isDownloading, transcript, status: transcribeStatus, progress: transcribeProgress } = useTranscription();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [viewMode, setViewMode] = useState<boolean>(false);
     const [popoverOpen, setPopoverOpen] = useState(false);
@@ -107,7 +107,7 @@ export default function TranscribeSection() {
                     className="border-2 border-primary focus:border-primary focus:ring-primary rounded-3xl px-4 py-8 w-full md:w-1/2 placeholder:text-primary/60 bg-transparent"
                     placeholder="Paste TikTok, Instagram Reel, or YouTube Shorts URL"
                 />
-                {!loading && <Recaptcha onChange={onCaptchaChange} />}
+                {!loading && transcribeStatus !== "processing" && status !== "downloading" && <Recaptcha onChange={onCaptchaChange} />}
                 <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                     <PopoverTrigger asChild>
                         <button
@@ -124,13 +124,26 @@ export default function TranscribeSection() {
                                                 : "Generate Transcript & Download Video"
                             }
                             className="w-full md:w-1/2 bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
-                            disabled={loading || !captchaToken || isDownloading || !videoUrl || status === "downloading"}
+                            disabled={loading || !captchaToken || isDownloading || !videoUrl || status === "downloading" || transcribeStatus === "processing"}
                         >
-                            {loading
-                                ? <div className="flex items-center justify-center gap-2"> <LineLoader /> Transcribing...</div>
-                                : status === "downloading"
-                                    ? <div className="flex items-center justify-center gap-2"> <LineLoader /> {isDownloading || status === "downloading" ? `Downloading... ${Math.round(progress)}%` : "Transcribing..."}</div>
-                                    : "Generate Transcript Or Download Video"}
+                            {transcribeStatus === "processing" ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <LineLoader />
+                                    {`Processing... ${Math.round(transcribeProgress)}%`}
+                                </div>
+                            ) : status === "downloading" ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <LineLoader />
+                                    {`Downloading... ${Math.round(progress)}%`}
+                                </div>
+                            ) : loading ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <LineLoader />
+                                    Processing...
+                                </div>
+                            ) : (
+                                "Generate Transcript Or Download Video"
+                            )}
 
                         </button>
 

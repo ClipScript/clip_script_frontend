@@ -30,15 +30,15 @@ export function useDownloadProgress(jobId: string | null) {
         const handleError = () => setStatus("error");
 
         // Subscribe to events
-        socket.on(`progress-${jobId}`, handleProgress);
-        socket.on(`completed-${jobId}`, handleCompleted);
-        socket.on(`error-${jobId}`, handleError);
+        socket.on(`progress-download-${jobId}`, handleProgress);
+        socket.on(`completed-download-${jobId}`, handleCompleted);
+        socket.on(`error-download-${jobId}`, handleError);
 
         // Cleanup
         return () => {
-            socket.off(`progress-${jobId}`, handleProgress);
-            socket.off(`completed-${jobId}`, handleCompleted);
-            socket.off(`error-${jobId}`, handleError);
+            socket.off(`progress-download-${jobId}`, handleProgress);
+            socket.off(`completed-download-${jobId}`, handleCompleted);
+            socket.off(`error-download-${jobId}`, handleError);
             setStatus("idle");
         };
     }, [jobId, socketRef.current]); // <-- use socketRef.current to trigger effect when socket is ready
