@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "./useSocket";
 import { TranscriptData } from "@/types/transcribe";
+import { showToaster } from "@/lib/utils";
 
 
 export function useTranscribeProgress(jobId: string | null) {
@@ -26,7 +27,10 @@ export function useTranscribeProgress(jobId: string | null) {
 
         };
 
-        const handleError = () => setStatus("error");
+        const handleError = (errorMessage: string) => {
+            showToaster(errorMessage, "error");
+            setStatus("idle");
+        };
 
         socket.on(`progress-transcribe-${jobId}`, handleProgress);
         socket.on(`completed-transcribe-${jobId}`, handleCompleted);

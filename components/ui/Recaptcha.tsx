@@ -13,7 +13,8 @@ export default function Recaptcha({ onChange }: { onChange: (token: string | nul
     useEffect(() => {
         if (window.grecaptcha) return;
         const script = document.createElement("script");
-        script.src = "https://www.google.com/recaptcha/api.js";
+        script.id = "recaptcha-script";
+        script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
         script.async = true;
         script.defer = true;
         document.body.appendChild(script);
@@ -21,12 +22,16 @@ export default function Recaptcha({ onChange }: { onChange: (token: string | nul
 
     useEffect(() => {
         if (!window.grecaptcha || renderedRef.current) return;
-        window.grecaptcha.render("recaptcha-container", {
-            sitekey: siteKey,
-            callback: onChange,
-            "expired-callback": () => onChange(null),
+
+        window.grecaptcha.ready(() => {
+            window.grecaptcha.render("recaptcha-container", {
+                sitekey: siteKey,
+                callback: onChange,
+                "expired-callback": () => onChange(null),
+            });
+
+            renderedRef.current = true;
         });
-        renderedRef.current = true;
     }, [onChange]);
 
     return <div id="recaptcha-container" />;

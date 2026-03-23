@@ -16,18 +16,10 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
-import { Clipboard, Download, Copy, Mic } from "lucide-react";
+import { Clipboard, Download, Copy, Mic, FileText } from "lucide-react";
 import { copyToClipboard, downLoadFile, downLoadVideo, downloadFile, downloadUtterances } from "@/lib/utils";
-import { SpinnerLoader } from "../genreral/common";
 import { formatMs } from "@/lib/utils";
 import LineLoader from "../genreral/lineLoader";
-import {
-    FileText,
-    FileSpreadsheet,
-    FileJson,
-    FileType,
-    FileDown
-} from 'lucide-react';
 import {
     Popover,
     PopoverContent,
@@ -38,6 +30,7 @@ import {
 } from "@/components/ui/popover"
 import { downloadFileActions } from "@/lib/utils";
 import { useDownloadProgress } from "@/hooks/useDownloadProgress";
+import { showToaster, detectPlatform } from "@/lib/utils";
 
 
 export default function TranscribeSection() {
@@ -45,8 +38,7 @@ export default function TranscribeSection() {
     const { captchaToken, onCaptchaChange } = useCaptcha();
     const { submitTranscription, loading, downloadVideo, isDownloading, transcript, status: transcribeStatus, progress: transcribeProgress } = useTranscription();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [viewMode, setViewMode] = useState<boolean>(false);
-    const [popoverOpen, setPopoverOpen] = useState(false);
+    const [viewMode, setViewMode] = useState<boolean>(false)
     const [downloadJobId, setDownloadJobId] = useState<string | null>(null);
     const { progress, status } = useDownloadProgress(downloadJobId);
 
@@ -55,41 +47,43 @@ export default function TranscribeSection() {
     }, [transcript]);
 
     const handleSubmit = async () => {
-        // e.preventDefault();
+        if (!detectPlatform(videoUrl)) {
+            showToaster("Unsupported platform. Please enter a TikTok, Instagram Reel, or YouTube Shorts URL.", "error");
+            return;
+        }
         if (!captchaToken) {
-            toast.error("Please complete the CAPTCHA");
+            showToaster("Please complete the CAPTCHA", "warning");
             return;
         }
         await submitTranscription(videoUrl, captchaToken);
     };
 
+    // const Actions = [
+    //     {
+    //         label: "Generate Transcript",
+    //         icon: Mic,
+    //         onClick: () => {
+    //             handleSubmit();
+    //             setPopoverOpen(false);
+    //         }
+    //     },
+    //     {
+    //         label: "Download Video",
+    //         icon: Download,
+    //         onClick: async () => {
+    //             const jobId = await downloadVideo(videoUrl, captchaToken);
+    //             if (jobId) {
+    //                 setDownloadJobId(jobId);
+    //             }
 
-    const Actions = [
-        {
-            label: "Generate Transcript",
-            icon: Mic,
-            onClick: () => {
-                handleSubmit();
-                setPopoverOpen(false);
-            }
-        },
-        {
-            label: "Download Video",
-            icon: Download,
-            onClick: async () => {
-                const jobId = await downloadVideo(videoUrl, captchaToken);
-                if (jobId) {
-                    setDownloadJobId(jobId);
-                }
-
-                setPopoverOpen(false);
-            }
-        }
-    ];
+    //             setPopoverOpen(false);
+    //         }
+    //     }
+    // ];
 
     return (
         <>
-            <form className="space-y-4 flex flex-col justify-center items-center" onSubmit={handleSubmit} >
+            <main className="space-y-4 flex flex-col justify-center items-center"  >
                 <div>
                     <h1 className="text-2xl font-bold text-center">Clip Script Transcript Generator</h1>
                     <p className="text-muted-foreground text-center mt-1">
@@ -108,64 +102,84 @@ export default function TranscribeSection() {
                     placeholder="Paste TikTok, Instagram Reel, or YouTube Shorts URL"
                 />
                 {!loading && transcribeStatus !== "processing" && status !== "downloading" && <Recaptcha onChange={onCaptchaChange} />}
-                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                    <PopoverTrigger asChild>
-                        <button
-                            type="button"
-                            title={
-                                loading
-                                    ? "Transcription in progress..."
-                                    : isDownloading
-                                        ? "Downloading in progress..."
-                                        : !captchaToken
-                                            ? "Please complete the CAPTCHA"
-                                            : !videoUrl
-                                                ? "Please enter a video URL"
-                                                : "Generate Transcript & Download Video"
+                <div className="flex flex-col items-start gap-2 w-full md:w-1/2 p-4">
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
+                        title={
+                            loading
+                                ? "Transcription in progress..."
+                                : !captchaToken
+                                    ? "Please complete the CAPTCHA"
+                                    : !videoUrl
+                                        ? "Please enter a video URL"
+                                        : "Generate Transcript"
+                        }
+                        className="w-full bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
+                        disabled={loading || !captchaToken || isDownloading || !videoUrl || status === "downloading" || transcribeStatus === "processing"}
+                    >
+                        {transcribeStatus === "processing" ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <LineLoader />
+                                {`Processing... ${Math.round(transcribeProgress)}%`}
+                            </div>
+                        ) : loading ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <LineLoader />
+                                Processing...
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center gap-2">
+                                <FileText className="w-5 h-5 text-white" />
+                                Generate Transcript
+                            </div>
+                        )}
+
+                    </button>
+                    <button
+                        type="button"
+                        onClick={async () => {
+                            if (!detectPlatform(videoUrl)) {
+                                showToaster("Unsupported platform. Please enter a TikTok, Instagram Reel, or YouTube Shorts URL.", "error");
+                                return;
                             }
-                            className="w-full md:w-1/2 bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
-                            disabled={loading || !captchaToken || isDownloading || !videoUrl || status === "downloading" || transcribeStatus === "processing"}
-                        >
-                            {transcribeStatus === "processing" ? (
-                                <div className="flex items-center justify-center gap-2">
-                                    <LineLoader />
-                                    {`Processing... ${Math.round(transcribeProgress)}%`}
-                                </div>
-                            ) : status === "downloading" ? (
-                                <div className="flex items-center justify-center gap-2">
-                                    <LineLoader />
-                                    {`Downloading... ${Math.round(progress)}%`}
-                                </div>
-                            ) : loading ? (
-                                <div className="flex items-center justify-center gap-2">
-                                    <LineLoader />
-                                    Processing...
-                                </div>
-                            ) : (
-                                "Generate Transcript Or Download Video"
-                            )}
+                            const jobId = await downloadVideo(videoUrl, captchaToken);
+                            if (jobId) {
+                                setDownloadJobId(jobId);
+                            }
+                        }}
+                        title={
+                            isDownloading
+                                ? "Downloading in progress..."
+                                : !captchaToken
+                                    ? "Please complete the CAPTCHA"
+                                    : !videoUrl
+                                        ? "Please enter a video URL"
+                                        : "Download Video"
+                        }
+                        className="w-full bg-destructive text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-destructive/80 transition-colors duration-200"
+                        disabled={loading || !captchaToken || isDownloading || !videoUrl || status === "downloading" || transcribeStatus === "processing"}
+                    >
+                        {status === "downloading" ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <LineLoader />
+                                {`Downloading... ${Math.round(progress)}%`}
+                            </div>
+                        ) : isDownloading ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <LineLoader />
+                                Processing...
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center gap-2">
+                                <Download className="w-5 h-5 text-white" />
+                                Download Video
+                            </div>
+                        )}
 
-                        </button>
-
-                    </PopoverTrigger>
-                    <PopoverContent className="w-50 bg-primary text-white">
-                        <div className="flex flex-col gap-1">
-                            <p className="">Proceed to:</p>
-                            <hr className="border-t border-gray-200 my-1" />
-                            {Actions.map(({ label, icon: Icon, onClick }) => (
-                                <button
-                                    key={label}
-                                    onClick={onClick}
-                                    className="flex items-center gap-2 py-2 px-1 rounded-md hover:bg-muted cursor-pointer hover:text-primary transition group"
-                                >
-                                    <Icon size={18} className="text-red-200 group-hover:text-red-400" />
-                                    <span className="text-sm">{label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </PopoverContent>
-                </Popover>
-            </form>
+                    </button>
+                </div>
+            </main>
             <Dialog open={isDialogOpen} onOpenChange={(open) => {
                 setIsDialogOpen(open);
                 if (!open) setVideoUrl("");

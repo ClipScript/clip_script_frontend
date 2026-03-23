@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "./useSocket";
+import { showToaster } from "@/lib/utils";
 
 export function useDownloadProgress(jobId: string | null) {
     const socketRef = useSocket();
@@ -27,7 +28,10 @@ export function useDownloadProgress(jobId: string | null) {
             link.href = fileUrl; // just the URL
             link.click()
         };
-        const handleError = () => setStatus("error");
+        const handleError = (errorMessage: string) => {
+            showToaster(errorMessage, "error");
+            setStatus("idle");
+        };
 
         // Subscribe to events
         socket.on(`progress-download-${jobId}`, handleProgress);

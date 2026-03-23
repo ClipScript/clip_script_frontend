@@ -184,3 +184,16 @@ export const downloadFileActions = [
     onClick: (transcript: string) => downloadFile(transcript, 'csv')
   },
 ];
+
+export const detectPlatform = (url: string) => {
+  if (url.includes("youtube.com/shorts") || url.includes("youtu.be")) {
+    return "YouTube";
+  } else if (url.includes("tiktok.com")) {
+    return "TikTok";
+  } else if (url.includes("instagram.com")) {
+    return "Instagram";
+  } else {
+    return null;
+  }
+}
+
