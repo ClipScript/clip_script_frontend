@@ -28,6 +28,14 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <meta property="og:title" content="Clip Script Transcript Generator" />
+        <meta
+          property="og:description"
+          content="Turn TikTok, Reels & Shorts into clean transcripts instantly."
+        />
+        <meta property="og:image" content="/social-preview.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://useclipscript.com/" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
