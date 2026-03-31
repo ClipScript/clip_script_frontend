@@ -33,9 +33,8 @@ export default function RootLayout({
           property="og:description"
           content="Turn TikTok, Reels & Shorts into clean transcripts instantly."
         />
-        <meta property="og:image" content="/social-preview.png" />
+        <meta property="og:image" content="https://useclipscript.com/social-preview.png" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://useclipscript.com" />
         <meta property="og:url" content="https://www.useclipscript.com" />
       </head>
       <body
