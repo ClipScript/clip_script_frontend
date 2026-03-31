@@ -17,8 +17,46 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Clip Script Transcript Generator",
   description: "Turn TikTok, Reels & Shorts into clean transcripts instantly.",
-};
 
+  metadataBase: new URL("https://www.useclipscript.com"),
+
+  openGraph: {
+    title: "Clip Script Transcript Generator",
+    description:
+      "Turn TikTok, Reels & Shorts into clean transcripts instantly.",
+    url: "https://www.useclipscript.com",
+    siteName: "ClipScript",
+    images: [
+      {
+        url: "/social-preview.png", // 👈 relative path is better here
+        width: 1200,
+        height: 630,
+        alt: "ClipScript Preview",
+      },
+    ],
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Clip Script Transcript Generator",
+    description:
+      "Turn TikTok, Reels & Shorts into clean transcripts instantly.",
+    images: ["/social-preview.png"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      "max-image-preview": "large",
+    },
+  },
+
+  icons: {
+    icon: "/logo.svg",
+  },
+};
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,17 +64,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
-        <meta property="og:title" content="Clip Script Transcript Generator" />
-        <meta
-          property="og:description"
-          content="Turn TikTok, Reels & Shorts into clean transcripts instantly."
-        />
-        <meta property="og:image" content="https://useclipscript.com/social-preview.png" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.useclipscript.com" />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
