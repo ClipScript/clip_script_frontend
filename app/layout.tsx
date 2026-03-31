@@ -35,7 +35,8 @@ export default function RootLayout({
         />
         <meta property="og:image" content="/social-preview.png" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://useclipscript.com/" />
+        <meta property="og:url" content="https://useclipscript.com" />
+        <meta property="og:url" content="https://www.useclipscript.com" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
