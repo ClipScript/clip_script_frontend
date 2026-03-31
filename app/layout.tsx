@@ -28,10 +28,9 @@ export const metadata: Metadata = {
     siteName: "ClipScript",
     images: [
       {
-        url: "/social-preview.png", // 👈 relative path is better here
+        url: "https://www.useclipscript.com/social-preview.png", // 👈 FULL URL (not relative)
         width: 1200,
         height: 630,
-        alt: "ClipScript Preview",
       },
     ],
     type: "website",
