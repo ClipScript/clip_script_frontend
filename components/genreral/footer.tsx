@@ -1,7 +1,7 @@
 import Logo from "./logo";
 export default function Footer() {
     return (
-        <footer className="w-full bg-gray-800 text-white py-8 px-4 ">
+        <footer className="w-full bg-gray-600 text-white py-8 px-4 ">
             <div className="w-full px-4 flex flex-col md:flex-row items-center justify-between gap-6">
                 <Logo />
                 <nav className="flex flex-col md:flex-row gap-4 md:gap-8 text-sm items-center">
