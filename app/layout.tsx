@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   },
 
   icons: {
-    icon: "/logo.svg",
+    icon: "/clipScript.png",
   },
 };
 export default function RootLayout({

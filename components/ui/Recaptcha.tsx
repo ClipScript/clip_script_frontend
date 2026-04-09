@@ -26,5 +26,19 @@ export default function Recaptcha({
         });
     }, [isReady, onChange]);
 
-    return <div ref={containerRef} />;
+    return (
+        <div
+            ref={containerRef}
+            style={{
+                position: "fixed",
+                bottom: 24,
+                right: 24,
+                zIndex: 1000,
+                background: "rgba(255,255,255,0.95)",
+                borderRadius: 12,
+                boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
+                padding: 8,
+            }}
+        />
+    );
 }

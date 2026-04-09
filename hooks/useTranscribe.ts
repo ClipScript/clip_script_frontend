@@ -11,6 +11,7 @@ export function useTranscription() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [showCaptcha, setShowCaptcha] = useState(false);
     const [transcribeJobId, setTranscribeJobId] = useState<string | null>(null);
 
     const { progress, status, transcript } = useTranscribeProgress(transcribeJobId);
@@ -34,19 +35,24 @@ export function useTranscription() {
     }, [status, fetchRecentTranscripts]);
 
     const submitTranscription = useCallback(
-        async (videoUrl: string, captchaToken: string) => {
+        async (videoUrl: string, captchaToken?: string | null) => {
             setLoading(true);
             setError(null);
 
             try {
-                const { jobId } = await TranscribeService.createTranscription(videoUrl, captchaToken);
-
+                const response = await TranscribeService.createTranscription(videoUrl, captchaToken);
+                const { jobId } = response;
                 setTranscribeJobId(jobId);
 
                 showToaster("Transcription started!", "success");
 
-            } catch (err) {
-                console.log("Transcribing error", err);
+            } catch (err: any) {
+                const errorMessage = err?.response?.data;
+                if (errorMessage?.requireCaptcha) {
+                    setShowCaptcha(true);
+                    showToaster("Please complete the CAPTCHA to continue.", "warning");
+                    return;
+                }
                 showToaster("Failed to generate transcript", "error");
             } finally {
                 setLoading(false);
@@ -86,6 +92,7 @@ export function useTranscription() {
         fetchRecentTranscripts,
         isDownloading,
         downloadVideo,
-        status
+        status,
+        showCaptcha
     }
 }

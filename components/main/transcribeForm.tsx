@@ -36,7 +36,7 @@ import { showToaster, detectPlatform } from "@/lib/utils";
 export default function TranscribeSection() {
     const [videoUrl, setVideoUrl] = useState("");
     const { captchaToken, onCaptchaChange } = useCaptcha();
-    const { submitTranscription, loading, downloadVideo, isDownloading, transcript, status: transcribeStatus, progress: transcribeProgress } = useTranscription();
+    const { submitTranscription, loading, downloadVideo, isDownloading, transcript, status: transcribeStatus, progress: transcribeProgress, showCaptcha } = useTranscription();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [viewMode, setViewMode] = useState<boolean>(false)
     const [downloadJobId, setDownloadJobId] = useState<string | null>(null);
@@ -51,35 +51,16 @@ export default function TranscribeSection() {
             showToaster("Unsupported platform. Please enter a TikTok, Instagram Reel, or YouTube Shorts URL.", "error");
             return;
         }
-        if (!captchaToken) {
+
+        // Only require captchaToken if CAPTCHA is shown
+        if (showCaptcha && !captchaToken) {
             showToaster("Please complete the CAPTCHA", "warning");
             return;
         }
+
         await submitTranscription(videoUrl, captchaToken);
+
     };
-
-    // const Actions = [
-    //     {
-    //         label: "Generate Transcript",
-    //         icon: Mic,
-    //         onClick: () => {
-    //             handleSubmit();
-    //             setPopoverOpen(false);
-    //         }
-    //     },
-    //     {
-    //         label: "Download Video",
-    //         icon: Download,
-    //         onClick: async () => {
-    //             const jobId = await downloadVideo(videoUrl, captchaToken);
-    //             if (jobId) {
-    //                 setDownloadJobId(jobId);
-    //             }
-
-    //             setPopoverOpen(false);
-    //         }
-    //     }
-    // ];
 
     return (
         <>
@@ -90,18 +71,38 @@ export default function TranscribeSection() {
                         Turn TikTok, Reels & Shorts into clean transcripts instantly.
                     </p>
                 </div>
-                <Input
-                    id="videoUrl"
-                    name="videoUrl"
-                    type="url"
-                    autoComplete="off"
-                    required
-                    value={videoUrl}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                    className="border-2 border-primary focus:border-primary focus:ring-primary rounded-3xl px-4 py-8 w-full md:w-1/2 placeholder:text-primary/60 bg-transparent"
-                    placeholder="Paste TikTok, Instagram Reel, or YouTube Shorts URL"
-                />
-                {!loading && transcribeStatus !== "processing" && status !== "downloading" && <Recaptcha onChange={onCaptchaChange} />}
+                <div className="relative w-full md:w-1/2">
+                    <Input
+                        id="videoUrl"
+                        name="videoUrl"
+                        type="url"
+                        autoComplete="off"
+                        required
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                        className="border-2 border-primary focus:border-primary focus:ring-primary rounded-3xl px-4 py-8 w-full placeholder:text-black bg-transparent pr-12"
+                        placeholder="Paste TikTok, Instagram Reel, or YouTube Shorts URL"
+                    />
+                    <button
+                        type="button"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:text-primary/80"
+                        title="Paste from clipboard"
+                        onClick={async () => {
+                            try {
+                                const text = await navigator.clipboard.readText();
+                                setVideoUrl(text);
+                            } catch {
+                                setVideoUrl("");
+                            }
+                        }}
+                        tabIndex={-1}
+                    >
+                        <Clipboard className="w-6 h-6" />
+                    </button>
+                </div>
+                {showCaptcha && !loading && transcribeStatus !== "processing" && status !== "downloading" && (
+                    <Recaptcha onChange={onCaptchaChange} />
+                )}
                 <div className="flex flex-col items-start gap-2 w-full md:w-1/2 p-4">
                     <button
                         type="button"
@@ -109,14 +110,12 @@ export default function TranscribeSection() {
                         title={
                             loading
                                 ? "Transcription in progress..."
-                                : !captchaToken
-                                    ? "Please complete the CAPTCHA"
-                                    : !videoUrl
-                                        ? "Please enter a video URL"
-                                        : "Generate Transcript"
+                                : !videoUrl
+                                    ? "Please enter a video URL"
+                                    : "Generate Transcript"
                         }
                         className="w-full bg-primary text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-primary/80 transition-colors duration-200"
-                        disabled={loading || !captchaToken || isDownloading || !videoUrl || status === "downloading" || transcribeStatus === "processing"}
+                        disabled={loading || isDownloading || !videoUrl || status === "downloading" || transcribeStatus === "processing"}
                     >
                         {transcribeStatus === "processing" ? (
                             <div className="flex items-center justify-center gap-2">
@@ -151,14 +150,12 @@ export default function TranscribeSection() {
                         title={
                             isDownloading
                                 ? "Downloading in progress..."
-                                : !captchaToken
-                                    ? "Please complete the CAPTCHA"
-                                    : !videoUrl
-                                        ? "Please enter a video URL"
-                                        : "Download Video"
+                                : !videoUrl
+                                    ? "Please enter a video URL"
+                                    : "Download Video"
                         }
                         className="w-full bg-destructive text-white py-4 rounded-3xl font-semibold mt-2 disabled:opacity-50 hover:bg-destructive/80 transition-colors duration-200"
-                        disabled={loading || !captchaToken || isDownloading || !videoUrl || status === "downloading" || transcribeStatus === "processing"}
+                        disabled={loading || isDownloading || !videoUrl || status === "downloading" || transcribeStatus === "processing"}
                     >
                         {status === "downloading" ? (
                             <div className="flex items-center justify-center gap-2">

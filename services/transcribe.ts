@@ -1,14 +1,16 @@
 import { axiosInstance } from "@/lib/utils";
 
 export const TranscribeService = {
-    createTranscription: async (videoUrl: string, captchaToken: string) => {
-        const response = await axiosInstance.post('/transcription', {
-            videoUrl,
-            captchaToken
-        });
-        console.log("Transcription job created:", response.data);
-        return {
-            jobId: response.data.jobId
+    createTranscription: async (videoUrl: string, captchaToken?: string | null) => {
+        try {
+            const response = await axiosInstance.post('/transcription', {
+                videoUrl,
+                captchaToken
+            });
+            return response.data;
+        } catch (error: any) {
+            console.log(error?.response?.data);
+            throw error;
         }
     },
 
