@@ -74,7 +74,7 @@ export default function TranscribeSection() {
                         : "flex justify-center items-center min-h-[60vh]"
                 }
             >
-                <section className={`${transcript ? "w-full md:w-1/2" : "w-full"}  bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex flex-col gap-4`}>
+                <section className={`${transcript ? "w-full md:w-1/2" : "w-full md:w-1/2  "}  bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex flex-col gap-4`}>
                     <div>
                         <h1 className="text-2xl font-bold text-center">Clip Script Transcript Generator</h1>
                         <p className="text-muted-foreground mt-1 text-center">
@@ -307,7 +307,7 @@ export default function TranscribeSection() {
                             {transcript ? (
                                 <>
                                     <div>
-                                        <pre className={`${!viewMode ? 'bg-primary text-white p-4' : 'bg-transparent'} rounded max-h-[70vh] overflow-auto whitespace-pre-wrap`}>
+                                        <pre className={`${!viewMode ? 'bg-primary text-white p-2' : 'bg-transparent'} rounded max-h-[70vh] overflow-auto whitespace-pre-wrap`}>
                                             {!viewMode ? transcript?.transcript : (
                                                 <>
                                                     {Array.isArray(transcript.utterances) && transcript.utterances.length > 0 ? (

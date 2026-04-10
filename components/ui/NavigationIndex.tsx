@@ -9,7 +9,7 @@ export function NavigationBar({ onOpen, isOpen }: { onOpen?: () => void, isOpen?
     return (
         <header className="border border-opacity-10 border-gray-200 bg-background/80 backdrop-blur-sm z-50 rounded-sm shadow-sm">
             <div className="flex h-16 items-center px-4 justify-between w-full">
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center">
                     <Logo />
                 </div>
 
