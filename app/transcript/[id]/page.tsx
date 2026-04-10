@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { TranscribeService } from "@/services/transcribe";
 import { useTranscription } from "@/hooks/useTranscribe";
 import { useState } from "react";
-import { RecentTranscriptData } from "@/types/transcribe";
+import { TranscriptData } from "@/types/transcribe";
 import { Loader } from "@/components/genreral/loader";
 import { copyToClipboard, downLoadFile } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ import {
     PopoverTitle,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { formatCount } from "@/lib/utils";
+import { Copy, Link, FileText, Eye, Heart, MessageCircle, Share2 } from "lucide-react";
 
 
 
@@ -31,7 +33,7 @@ export default function TranscriptPage() {
     const { id } = useParams();
     const router = useRouter();
     const { recentTranscripts } = useTranscription();
-    const [singleTranscript, setSingleTranscript] = useState<RecentTranscriptData | null>(null);
+    const [singleTranscript, setSingleTranscript] = useState<TranscriptData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isDownloading, setIsDownloading] = useState(false);
     const [viewMode, setViewMode] = useState<boolean>(false);
@@ -52,14 +54,7 @@ export default function TranscriptPage() {
             }
         };
 
-        if (id && recentTranscripts.length > 0) {
-            const transcript = recentTranscripts.find(t => t._id === id);
-            console.log("Found transcript in recent transcripts:", transcript);
-            setSingleTranscript(transcript ?? null);
-            return;
-        } else {
-            fetchTranscript();
-        }
+        fetchTranscript();
     }, [id]);
 
     return (
@@ -129,6 +124,62 @@ export default function TranscriptPage() {
                     <pre className="bg-muted text-primary font-mono p-4 rounded max-h-[70vh] overflow-auto whitespace-pre-wrap">
                         {!viewMode ? singleTranscript?.transcript : downloadUtterances(singleTranscript?.utterances)}
                     </pre>
+                    <div className="w-full md:1/2 bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex items-start gap-6">
+                        <div className="mb-2 w-full">
+                            {singleTranscript.metadata.media.thumbnailUrl && (
+                                <img
+                                    src={singleTranscript.metadata.media.thumbnailUrl}
+                                    alt="Thumbnail"
+                                    className="rounded-lg border border-gray-200 object-cover"
+                                />
+                            )}
+                        </div>
+                        <section className="flex flex-col gap-4">
+                            <div className="flex items-center gap-3 mb-2">
+                                {singleTranscript.metadata.author.avatarUrl && (
+                                    <img
+                                        src={singleTranscript.metadata.author.avatarUrl}
+                                        alt="Avatar"
+                                        className="rounded-full border border-gray-300 object-cover w-14 h-14"
+                                    />
+                                )}
+                                <div>
+                                    <div className="font-semibold text-base">{singleTranscript.metadata.author.displayName}</div>
+                                    <div className="text-sm text-gray-500">@{singleTranscript.metadata.author.username}</div>
+                                </div>
+                            </div>
+                            <span className="text-lg font-bold mb-2 text-gray-700">{singleTranscript.metadata.description}</span>
+                            <div className="text-sm text-gray-700">
+                                <div className="mb-2">
+                                    <span className="font-semibold text-red-600">Platform:</span> {singleTranscript.metadata.platform &&
+                                        singleTranscript.metadata.platform.charAt(0).toUpperCase() +
+                                        singleTranscript.metadata.platform.slice(1).toLowerCase()
+                                    }
+                                </div>
+                                <div className="mb-2">
+                                    <span className="font-semibold">Video URL:</span> <a href={singleTranscript.metadata.videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline break-all">{singleTranscript.metadata.videoUrl}</a>
+                                </div>
+                                <div className="flex flex-wrap gap-4 mt-4">
+                                    <div className="mb-2 flex items-center gap-1">
+                                        <Eye className="w-4 h-4 text-gray-500" />
+                                        {formatCount(singleTranscript.metadata.stats.views)} views
+                                    </div>
+                                    <div className="mb-2 flex items-center gap-1">
+                                        <Heart className="w-4 h-4 text-gray-500" />
+                                        {formatCount(singleTranscript.metadata.stats.likes)} likes
+                                    </div>
+                                    <div className="mb-2 flex items-center gap-1">
+                                        <MessageCircle className="w-4 h-4 text-gray-500" />
+                                        {formatCount(singleTranscript.metadata.stats.comments)} comments
+                                    </div>
+                                    <div className="mb-2 flex items-center gap-1">
+                                        <Share2 className="w-4 h-4 text-gray-500" />
+                                        {formatCount(singleTranscript.metadata.stats.shares)} shares
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
                 </div>
             )}
         </Layout>
