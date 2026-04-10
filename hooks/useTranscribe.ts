@@ -7,14 +7,15 @@ import { useTranscribeProgress } from "./useTranscribeProgress";
 
 export function useTranscription() {
     const [recentTranscripts, setRecentTranscripts] = useState<RecentTranscriptData[]>([]);
+    const [transcript, setTranscript] = useState<TranscriptData | null>(null);
     const [isFetching, setIsFetching] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [showCaptcha, setShowCaptcha] = useState(false);
-    const [transcribeJobId, setTranscribeJobId] = useState<string | null>(null);
+    // const [transcribeJobId, setTranscribeJobId] = useState<string | null>(null);
 
-    const { progress, status, transcript } = useTranscribeProgress(transcribeJobId);
+    // const { progress, status, transcript } = useTranscribeProgress(transcribeJobId);
 
     const fetchRecentTranscripts = useCallback(async () => {
         setIsFetching(true);
@@ -29,10 +30,10 @@ export function useTranscription() {
     }, []);
 
     useEffect(() => {
-        if (status === "completed") {
-            fetchRecentTranscripts();
-        }
-    }, [status, fetchRecentTranscripts]);
+
+        fetchRecentTranscripts();
+
+    }, [fetchRecentTranscripts]);
 
     const submitTranscription = useCallback(
         async (videoUrl: string, captchaToken?: string | null) => {
@@ -41,11 +42,8 @@ export function useTranscription() {
 
             try {
                 const response = await TranscribeService.createTranscription(videoUrl, captchaToken);
-                const { jobId } = response;
-                setTranscribeJobId(jobId);
-
-                showToaster("Transcription started!", "success");
-
+                console.log('the result ', response)
+                setTranscript(response);
             } catch (err: any) {
                 const errorMessage = err?.response?.data;
                 if (errorMessage?.requireCaptcha) {
@@ -84,7 +82,6 @@ export function useTranscription() {
     return {
         loading,
         error,
-        progress,
         transcript,
         submitTranscription,
         isFetching,
@@ -92,7 +89,6 @@ export function useTranscription() {
         fetchRecentTranscripts,
         isDownloading,
         downloadVideo,
-        status,
         showCaptcha
     }
 }

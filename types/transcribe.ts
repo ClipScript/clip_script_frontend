@@ -1,9 +1,24 @@
 export interface TranscriptData {
     transcript: string;
-    status?: string;
-    jobId?: string;
-    platform?: string,
-    videoUrl?: string,
+    metadata: {
+        platform?: string;
+        videoUrl?: string;
+        description?: string;
+        author: {
+            username: string;
+            displayName: string;
+            avatarUrl: string;
+        };
+        media: {
+            thumbnailUrl: string;
+        };
+        stats: {
+            views: number;
+            likes: number;
+            comments: number;
+            shares: number;
+        }
+    };
     utterances?: Array<{
         text: string;
         start: number;
