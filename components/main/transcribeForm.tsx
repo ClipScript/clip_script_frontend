@@ -74,7 +74,7 @@ export default function TranscribeSection() {
                         : "flex justify-center items-center min-h-[60vh]"
                 }
             >
-                <section className={`${transcript ? "w-full md:w-1/2" : "w-full md:w-1/2  "}  bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex flex-col gap-4`}>
+                <section className={`${transcript ? "w-full" : "w-full md:w-1/2  "}  bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex flex-col gap-4`}>
                     <div>
                         <h1 className="text-2xl font-bold text-center">Clip Script Transcript Generator</h1>
                         <p className="text-muted-foreground mt-1 text-center">
@@ -177,8 +177,8 @@ export default function TranscribeSection() {
                 </section>
                 {/* Metadata and Stats Section */}
                 {transcript && (
-                    <div className="w-full md:1/2 bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex items-start gap-6">
-                        <div className="mb-2 w-full">
+                    <div className="w-full bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex items-start gap-6">
+                        <div className="w-full">
                             {transcript.metadata.media.thumbnailUrl && (
                                 <img
                                     src={transcript.metadata.media.thumbnailUrl}
@@ -222,19 +222,19 @@ export default function TranscribeSection() {
                                     <span className="font-semibold">Video URL:</span> <a href={transcript.metadata.videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline break-all">{transcript.metadata.videoUrl}</a>
                                 </div>
                                 <div className="flex flex-wrap gap-4 mt-4">
-                                    <div className="mb-2 flex items-center gap-1">
+                                    <div className=" flex items-center gap-1">
                                         <Eye className="w-4 h-4 text-gray-500" />
                                         {formatCount(transcript.metadata.stats.views)} views
                                     </div>
-                                    <div className="mb-2 flex items-center gap-1">
+                                    <div className="flex items-center gap-1">
                                         <Heart className="w-4 h-4 text-gray-500" />
                                         {formatCount(transcript.metadata.stats.likes)} likes
                                     </div>
-                                    <div className="mb-2 flex items-center gap-1">
+                                    <div className="flex items-center gap-1">
                                         <MessageCircle className="w-4 h-4 text-gray-500" />
                                         {formatCount(transcript.metadata.stats.comments)} comments
                                     </div>
-                                    <div className="mb-2 flex items-center gap-1">
+                                    <div className="flex items-center gap-1">
                                         <Share2 className="w-4 h-4 text-gray-500" />
                                         {formatCount(transcript.metadata.stats.shares)} shares
                                     </div>
