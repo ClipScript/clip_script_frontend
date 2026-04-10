@@ -74,7 +74,7 @@ export default function TranscribeSection() {
                         : "flex justify-center items-center min-h-[60vh]"
                 }
             >
-                <section className={`${transcript ? "w-full" : "w-1/2"}  bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex flex-col gap-4`}>
+                <section className={`${transcript ? "w-1/2" : "w-full"}  bg-white/80 rounded-xl shadow p-6 border border-gray-200 flex flex-col gap-4`}>
                     <div>
                         <h1 className="text-2xl font-bold text-center">Clip Script Transcript Generator</h1>
                         <p className="text-muted-foreground mt-1 text-center">
@@ -183,7 +183,7 @@ export default function TranscribeSection() {
                                 <img
                                     src={transcript.metadata.media.thumbnailUrl}
                                     alt="Thumbnail"
-                                    className="rounded-lg border border-gray-200 object-cover w-full max-h-60"
+                                    className="rounded-lg border border-gray-200 object-cover w-full"
                                 />
                             )}
                             {/* Video player if direct video URL is available */}
