@@ -29,12 +29,6 @@ export function useTranscription() {
         }
     }, []);
 
-    useEffect(() => {
-
-        fetchRecentTranscripts();
-
-    }, [fetchRecentTranscripts]);
-
     const submitTranscription = useCallback(
         async (videoUrl: string, captchaToken?: string | null) => {
             setLoading(true);

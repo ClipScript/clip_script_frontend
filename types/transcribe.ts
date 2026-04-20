@@ -2,7 +2,6 @@ export interface TranscriptData {
     transcript: string;
     metadata: {
         platform?: string;
-        videoUrl?: string;
         description?: string;
         author: {
             username: string;
@@ -24,6 +23,7 @@ export interface TranscriptData {
         start: number;
         end: number;
     }>;
+    videoUrl?: string
 }
 
 export type UtteranceType = {

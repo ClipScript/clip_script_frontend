@@ -218,9 +218,11 @@ export default function TranscribeSection() {
                                         transcript.metadata.platform.slice(1).toLowerCase()
                                     }
                                 </div>
-                                <div className="mb-2">
-                                    <span className="font-semibold">Video URL:</span> <a href={transcript.metadata.videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline break-all">{transcript.metadata.videoUrl}</a>
-                                </div>
+                                {transcript.videoUrl && (
+                                    <div className="mb-2">
+                                        <span className="font-semibold">Video URL:</span> <a href={transcript?.videoUrl} target="_blank" className="text-primary underline break-all">{transcript?.videoUrl}</a>
+                                    </div>
+                                )}
                                 <div className="flex flex-wrap gap-4 mt-4">
                                     <div className=" flex items-center gap-1">
                                         <Eye className="w-4 h-4 text-gray-500" />
