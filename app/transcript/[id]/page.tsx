@@ -157,7 +157,7 @@ export default function TranscriptPage() {
                                     }
                                 </div>
                                 <div className="mb-2">
-                                    <span className="font-semibold">Video URL:</span> <a href={singleTranscript.metadata.videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline break-all">{singleTranscript.metadata.videoUrl}</a>
+                                    <span className="font-semibold">Video URL:</span> <a href={singleTranscript.videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline break-all">{singleTranscript.videoUrl}</a>
                                 </div>
                                 <div className="flex flex-wrap gap-4 mt-4">
                                     <div className="mb-2 flex items-center gap-1">

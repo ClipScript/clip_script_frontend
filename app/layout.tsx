@@ -52,9 +52,6 @@ export const metadata: Metadata = {
     },
   },
 
-  icons: {
-    icon: "/favicon.png",
-  },
 };
 export default function RootLayout({
   children,
@@ -63,9 +60,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.png" type="image/png" />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
